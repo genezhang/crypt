@@ -1,7 +1,15 @@
 # Go Vault Secret for Encryption
 
-Just started to connect Hashicorp Vault to memguard to keep key/iv safe
+Just started to connect Hashicorp Vault to memguard to keep key/iv safe.
 Use to encrypt and decrypt data.
+
+* Added `guardedclient` based on vault/api with only potential exposure is the http.Response.
+* The secret byte slice is immediately put into a `LockedBuffer` reading from `resp.Body` (`GuardedSecret`).
+* The secret byte slice is not decoded using JSON decode by using no-copy scan for JSON path to
+return values using `buger/jsonparser`.
+* A returned value is in a `LockedBuffer` that can be sealed into an `Enclave`.
+
+TODO: more functions on `GuardedSecret`.
 
 ## Start Vault docker in dev mode
 

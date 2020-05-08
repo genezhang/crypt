@@ -1,9 +1,9 @@
 package main
 
 import (
+	"crypt/guardedclient"
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/hex"
 	"fmt"
 	"os"
 
@@ -30,23 +30,25 @@ func main() {
                 return
         }
         client.SetToken(token)
-        secret, err := client.Logical().Read("kv/ch-events/secrets/tenant")
+        gsecret, err := guardedclient.NewGuardedLogical(client).Read("kv/ch-events/secrets/tenant")
         if err != nil {
                 fmt.Println(err)
                 return
         }
+	// fmt.Printf("%v\n", string(gsecret.Bytes()))
 
 	// Load your secret key from a safe place and reuse it across multiple
 	// NewCipher calls.
-	// need to figure out how to wipe out the return strings
-	key, _ := hex.DecodeString(secret.Data["key"].(string))
+	key, _ := gsecret.GetSecretDecodedHexBytes("key")
 	// We will make the IV secure also
-	iv, _ := hex.DecodeString(secret.Data["iv"].(string))
+	iv, _ := gsecret.GetSecretDecodedHexBytes("iv")
 
 	// Secure the key inside an Enclave
-	encKey := memguard.NewEnclave(key)
+	// encKey := memguard.NewEnclave(key)
+	encKey := key.Seal()
 	// Secure the iv inside an Enclave
-	encIV := memguard.NewEnclave(iv)
+	// encIV := memguard.NewEnclave(iv)
+	encIV := iv.Seal()
 
 	plaintext := []byte("some plaintext, I want it to be long long long longer longer longer, very long very very long long long.")
 
