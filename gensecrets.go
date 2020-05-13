@@ -30,6 +30,7 @@ func main() {
         }
         client.SetToken(token)
 
+	// generate secrets for keys from 1000 to 3000 (non-inclusive)
 	for i:=1000; i < 3000; i++ {
 		keyiv, err := memguard.NewBufferFromReader(rand.Reader, 48)    // 32 byte key + 16 byte iv
 		if err != nil {

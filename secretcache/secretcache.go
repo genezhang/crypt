@@ -59,7 +59,7 @@ func Get(key string) (*memguard.Enclave, bool) {
 			return nil, false
 		}
 	}
-	defer keyiv.Destroy()
+	// defer keyiv.Destroy()
 
         // Secure the key inside an Enclave
         // encKey := memguard.NewEnclave(key)

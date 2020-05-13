@@ -122,8 +122,8 @@ func (s *GuardedSecret) GetSecretDecodedHexBytes(key string) (*memguard.LockedBu
 	if dtype != jsonparser.String {
 		return nil, errors.New("not a string")
 	}
-	bytes := make([]byte, hex.DecodedLen(len(bs)))
-	l, err := hex.Decode(bytes, bs)
+	buf := memguard.NewBuffer(hex.DecodedLen(len(bs)))
+	l, err := hex.Decode(buf.Bytes(), bs)
 	if err != nil {
 		return nil, err
 	}
@@ -131,6 +131,7 @@ func (s *GuardedSecret) GetSecretDecodedHexBytes(key string) (*memguard.LockedBu
 		return nil, errors.New("empty value")
 	}
 
-	return memguard.NewBufferFromBytes(bytes), nil
+	buf.Freeze()
+	return buf, nil
 }
 
