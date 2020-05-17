@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypt/guardedclient"
 	"crypt/secretcache"
 	"crypto/aes"
 	"crypto/cipher"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/awnumar/memguard"
 )
+
+const path string = "kv/ch-events/secrets/tenants/"
 
 var token = os.Getenv("VAULT_TOKEN")
 var vault_addr = os.Getenv("VAULT_ADDR")
@@ -25,10 +28,13 @@ func main() {
 	// Purge the session when we return
 	defer memguard.Purge()
 
-	if err := secretcache.InitClient(vault_addr, token); err != nil {
-		fmt.Println("vault client init failed")
+	gclient, err := guardedclient.NewGuardedClient(vault_addr, token)
+	if err != nil {
+		fmt.Println("new guarded vault client failed")
 		return
 	}
+
+	secretcache := secretcache.NewSecretCache(gclient, path)
 
 	plaintext := []byte("some plaintext, I want it to be long long long longer longer longer, very long very very long long long.")
 
