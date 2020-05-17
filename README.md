@@ -8,7 +8,7 @@ Use to encrypt and decrypt data. The key-iv pair used for encryption are stored 
 * The secret byte slice is decoded not using JSON decoder but using no-copy scan for JSON path to
 return values using `buger/jsonparser`.
 * A returned value is in a `LockedBuffer` that can be sealed into an `Enclave`.
-* Added `secretcache`, a map used to keep the secrets in a local cache.
+* Added `SecretCache`, a map used to keep the secrets in a local cache.
 
 TODO: more functions on `GuardedSecret`.
 
@@ -29,7 +29,7 @@ vault kv put kv/ch-events/secrets/tenant key=6368616e676520746869732070617373776
 The key and iv pair are just for testing purpose.
 
  
-## To run Go code outside of the container
+## To run Go code in examples outside of the container
 
 Need to setup the same environment variables:
 ```
@@ -44,7 +44,7 @@ go run gensecrets.go
 
 Then execute:
 ```
-go run main.go 1000 1002 2000 1002 4000
+go run test_encrypt.go 1000 1002 2000 1002 4000
 ```
 This includes testing for secret cache and generate a secret on demand.
 
