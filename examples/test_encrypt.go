@@ -5,8 +5,11 @@ import (
 	"crypt/secretcache"
 	"crypto/aes"
 	"crypto/cipher"
+//	"encoding/binary"
 	"fmt"
+//	"math"
 	"os"
+	"unsafe"
 
 	"github.com/awnumar/memguard"
 )
@@ -73,5 +76,29 @@ func main() {
 		stream.XORKeyStream(plaintext2, ciphertext)
 
 		fmt.Printf("%s\n", plaintext2)
+
+		// encrypt a float32 number
+		var f float32 = 123.456
+		ci := make([]byte, 4)
+	        stream = cipher.NewCTR(block, keyIVBuf.Bytes()[32:])
+		fb := (*[4]byte)(unsafe.Pointer(&f))[:]
+		stream.XORKeyStream(ci, fb)
+		// stream.XORKeyStream(ci, (*[4]byte)(unsafe.Pointer(&f))[:])
+		fmt.Printf("%x\n", ci)
+		/*
+		bits := binary.LittleEndian.Uint32(ci)
+		float := math.Float32frombits(bits)
+		fmt.Printf("encypted: %g\n", f)
+		*/
+		float := **(**float32)(unsafe.Pointer(&ci))
+		fmt.Printf("encypted: %g\n", float)
+
+	        stream = cipher.NewCTR(block, keyIVBuf.Bytes()[32:])
+		stream.XORKeyStream(fb, ci)
+		/* stream.XORKeyStream(ci, ci)
+		bits = binary.LittleEndian.Uint32(ci)
+		float = math.Float32frombits(bits)
+		*/
+		fmt.Printf("decypted: %g\n", f)
 	}
 }
